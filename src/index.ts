@@ -88,24 +88,26 @@ function createField(type: GraphQLNamedType, required?: boolean) {
   }
 }
 
-const module = {
-  plugin: (schema: GraphQLSchema) => {
-    let result = `import * as yup from 'yup';`;
-    const types = Object.keys(schema.getTypeMap());
-    types.forEach((typeName) => {
-      const type = schema.getType(typeName);
-      if (type) {
-        result += `
-                export function get${typeName}Schema() {
-                    return ${createField(type, true)}
-                }
+function plugin(schema: GraphQLSchema) {
+  let result = `import * as yup from 'yup';`;
+  const types = Object.keys(schema.getTypeMap());
+  types.forEach((typeName) => {
+    const type = schema.getType(typeName);
+    if (type) {
+      result += `
+              export function get${typeName}Schema() {
+                  return ${createField(type, true)}
+              }
 
-                `;
-      }
-    });
+              `;
+    }
+  });
 
-    return result;
-  },
+  return result;
+}
+
+export { plugin };
+
+export default {
+  plugin,
 };
-
-export default module;
