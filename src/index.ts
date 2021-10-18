@@ -53,7 +53,7 @@ function createObjectType(
   required?: boolean
 ): string {
   const fields = type.getFields();
-  let objResult = "yup.object().shap({ ";
+  let objResult = "yup.object().shape({ ";
   for (let name in fields) {
     objResult += `${name}: ${createField((fields as any)[name].type, false)}${
       required ? ".required()" : ""
