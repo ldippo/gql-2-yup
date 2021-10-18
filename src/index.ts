@@ -1,3 +1,4 @@
+import { memoize } from "lodash";
 import {
   GraphQLSchema,
   GraphQLNamedType,
@@ -22,7 +23,10 @@ enum GQLTypes {
   GraphQLInputObjectType = "GraphQLInputObjectType",
 }
 
-function createScalarType(type: GraphQLNamedType, required?: boolean) {
+const createScalarType = memoize(function createScalarType(
+  type: GraphQLNamedType,
+  required?: boolean
+) {
   function processInner(str: string) {
     return `yup.${str}${required ? ".required()" : ""}`;
   }
@@ -46,9 +50,9 @@ function createScalarType(type: GraphQLNamedType, required?: boolean) {
       break;
   }
   return res;
-}
+});
 
-function createObjectType(
+const createObjectType = memoize(function createObjectType(
   type: GraphQLObjectType<any, any>,
   required?: boolean
 ): string {
@@ -61,23 +65,32 @@ function createObjectType(
   }
   objResult += ` })${required ? "" : ".default(null).nullable()"}`;
   return objResult;
-}
+});
 
-function createListType(type: GraphQLNamedType, required?: boolean): string {
+const createListType = memoize(function createListType(
+  type: GraphQLNamedType,
+  required?: boolean
+): string {
   return `yup.array().of(${createField(type, false)})${
     required ? ".required()" : ""
   }`;
-}
+});
 
-function createEnumType(type: GraphQLEnumType, required?: boolean): string {
+const createEnumType = memoize(function createEnumType(
+  type: GraphQLEnumType,
+  required?: boolean
+): string {
   return `yup.mixed().oneOf([${type
     .getValues()
     .map(({ value }) => `'${value}'`)
     .concat("null")
     .join(",")}])${required ? ".required()" : ""}`;
-}
+});
 
-function createField(type: GraphQLNamedType, required?: boolean) {
+const createField = memoize(function createField(
+  type: GraphQLNamedType,
+  required?: boolean
+) {
   let val;
   switch ((type as any).__proto__.constructor.name) {
     case GQLTypes.GraphQLNonNull:
@@ -97,7 +110,7 @@ function createField(type: GraphQLNamedType, required?: boolean) {
       break;
   }
   return val;
-}
+});
 
 function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
   let pluginOutput = `import * as yup from 'yup';`;
@@ -115,11 +128,5 @@ export function get${typeName}Schema() {
 
   return pluginOutput;
 }
-// @ts-ignore
-module.exports = {
-  plugin,
-};
+
 export { plugin };
-export default {
-  plugin,
-};
