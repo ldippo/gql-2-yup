@@ -57,7 +57,7 @@ function createObjectType(
   for (let name in fields) {
     objResult += `${name}: ${createField((fields as any)[name].type, false)}${
       required ? ".required()" : ""
-    }`;
+    },`;
   }
   objResult += ` })${required ? "" : ".default(null).nullable()"}`;
   return objResult;
@@ -106,9 +106,9 @@ function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
     const type = schema.getType(typeName);
     if (type) {
       pluginOutput += `
-              export function get${typeName}Schema() {
-                  return ${createField(type, true)}
-              }
+export function get${typeName}Schema() {
+    return ${createField(type, true)}
+}
 
               `;
     }
