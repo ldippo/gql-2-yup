@@ -6,6 +6,8 @@ import {
   GraphQLEnumType,
 } from "graphql";
 
+import { writeFileSync, existsSync, appendFileSync } from "fs";
+
 enum Scalars {
   ID = "ID",
   String = "String",
@@ -113,20 +115,28 @@ const createField = memoize(function createField(
 });
 
 function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
-  let pluginOutput = `import * as yup from 'yup';`;
+  let pluginOutput = `import * as yup from 'yup';\n\n`;
+  const filePath = `${__dirname}/tmp-schema`;
+  if (!existsSync(filePath)) writeFileSync(filePath, pluginOutput);
   const types = Object.keys(schema.getTypeMap());
   types.forEach((typeName) => {
     const type = schema.getType(typeName);
-    if (type) {
-      pluginOutput += `
+    try {
+      if (type) {
+        const def = `
 export function get${typeName}Schema() {
     return ${createField(type, true)}
 }
-              `;
+                `;
+        appendFileSync(filePath, def);
+      }
+    } catch (e) {
+      console.error(`Failed to create schema for ${typeName}`);
+      console.error(e);
     }
   });
 
-  return pluginOutput;
+  return "";
 }
 
 export { plugin };
