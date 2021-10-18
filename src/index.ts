@@ -47,30 +47,28 @@ function createObjectType(
   required?: boolean
 ): string {
   const fields = type.getFields();
-  let result = "yup.object().shap({ ";
+  let objResult = "yup.object().shap({ ";
   for (let name in fields) {
-    result += `${name}: ${createField((fields as any)[name].type, false)}${
+    objResult += `${name}: ${createField((fields as any)[name].type, false)}${
       required ? ".required()" : ""
     }`;
   }
-  result += ` })${required ? "" : ".default(null).nullable()"}`;
-  return result;
+  objResult += ` })${required ? "" : ".default(null).nullable()"}`;
+  return objResult;
 }
 
 function createListType(type: GraphQLNamedType, required?: boolean): string {
-  const result = `yup.array().of(${createField(type, false)})${
+  return `yup.array().of(${createField(type, false)})${
     required ? ".required()" : ""
   }`;
-  return result;
 }
 
 function createEnumType(type: GraphQLEnumType, required?: boolean): string {
-  const result = `yup.mixed().oneOf([${type
+  return `yup.mixed().oneOf([${type
     .getValues()
     .map(({ value }) => `'${value}'`)
     .concat("null")
     .join(",")}])${required ? ".required()" : ""}`;
-  return result;
 }
 
 function createField(type: GraphQLNamedType, required?: boolean) {
@@ -88,13 +86,13 @@ function createField(type: GraphQLNamedType, required?: boolean) {
   }
 }
 
-function plugin(schema: GraphQLSchema) {
-  let result = `import * as yup from 'yup';`;
+function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
+  let pluginOutput = `import * as yup from 'yup';`;
   const types = Object.keys(schema.getTypeMap());
   types.forEach((typeName) => {
     const type = schema.getType(typeName);
     if (type) {
-      result += `
+      pluginOutput += `
               export function get${typeName}Schema() {
                   return ${createField(type, true)}
               }
@@ -103,7 +101,7 @@ function plugin(schema: GraphQLSchema) {
     }
   });
 
-  return result;
+  return pluginOutput;
 }
 
 export { plugin };
