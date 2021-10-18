@@ -110,6 +110,8 @@ const createField = memoize(function createField(
     case GQLTypes.GraphQLInputObjectType:
       val = createObjectType(type as GraphQLObjectType, required);
       break;
+    default:
+      val = `get${type.name}Schema()`;
   }
   return val;
 });
