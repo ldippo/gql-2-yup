@@ -26,20 +26,26 @@ function createScalarType(type: GraphQLNamedType, required?: boolean) {
   function processInner(str: string) {
     return `yup.${str}${required ? ".required()" : ""}`;
   }
+  let res;
   switch (type.name) {
     case Scalars.ID:
-      return processInner("string()");
     case Scalars.String:
-      return processInner("string()");
+      res = processInner("string()");
+      break;
     case Scalars.Boolean:
-      return processInner("boolean()");
+      res = processInner("boolean()");
+      break;
     case Scalars.Float:
-      return processInner("number()");
+      res = processInner("number()");
+      break;
     case Scalars.Int:
-      return processInner("number().integer()");
+      res = processInner("number().integer()");
+      break;
     case Scalars.DateTime:
-      return processInner("date()");
+      res = processInner("date()");
+      break;
   }
+  return res;
 }
 
 function createObjectType(
@@ -72,18 +78,25 @@ function createEnumType(type: GraphQLEnumType, required?: boolean): string {
 }
 
 function createField(type: GraphQLNamedType, required?: boolean) {
+  let val;
   switch ((type as any).__proto__.constructor.name) {
     case GQLTypes.GraphQLNonNull:
-      return `get${(type as any).ofType}Schema()`;
+      val = `get${(type as any).ofType}Schema()`;
+      break;
     case GQLTypes.GraphQLEnumType:
-      return createEnumType(type as GraphQLEnumType, required);
+      val = createEnumType(type as GraphQLEnumType, required);
+      break;
     case GQLTypes.GraphQLScalarType:
-      return createScalarType(type, required);
+      val = createScalarType(type, required);
+      break;
     case GQLTypes.GraphQLList:
-      return createListType(type, required);
+      val = createListType(type, required);
+      break;
     case GQLTypes.GraphQLInputObjectType:
-      return createObjectType(type as GraphQLObjectType, required);
+      val = createObjectType(type as GraphQLObjectType, required);
+      break;
   }
+  return val;
 }
 
 function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
@@ -103,9 +116,11 @@ function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
 
   return pluginOutput;
 }
-
+// @ts-ignore
+module.exports = {
+  plugin,
+};
 export { plugin };
-
 export default {
   plugin,
 };
