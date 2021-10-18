@@ -83,14 +83,14 @@ function createField(type: GraphQLNamedType, required?: boolean) {
     case GQLTypes.GraphQLNonNull:
       val = `get${(type as any).ofType}Schema()`;
       break;
-    case GQLTypes.GraphQLEnumType:
-      val = createEnumType(type as GraphQLEnumType, required);
-      break;
     case GQLTypes.GraphQLScalarType:
       val = createScalarType(type, required);
       break;
     case GQLTypes.GraphQLList:
       val = createListType(type, required);
+      break;
+    case GQLTypes.GraphQLEnumType:
+      val = createEnumType(type as GraphQLEnumType, required);
       break;
     case GQLTypes.GraphQLInputObjectType:
       val = createObjectType(type as GraphQLObjectType, required);
@@ -109,7 +109,6 @@ function plugin(schema: GraphQLSchema, _documents?: any, _config?: any) {
 export function get${typeName}Schema() {
     return ${createField(type, true)}
 }
-
               `;
     }
   });
