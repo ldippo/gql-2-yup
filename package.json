@@ -1,0 +1,29 @@
+{
+  "name": "gql-2-yup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "prepack": "yarn build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ldippo/gql-2-yup.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ldippo/gql-2-yup/issues"
+  },
+  "homepage": "https://github.com/ldippo/gql-2-yup#readme",
+  "devDependencies": {
+    "graphql": "^15.6.1",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "yup": "^0.32.11"
+  }
+}
